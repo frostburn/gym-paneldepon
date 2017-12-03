@@ -62,6 +62,10 @@ def beam_up(panels):
     return panels
 
 
+def popcount(panels):
+    return sum(bool(panels & (1 << i)) for i in range(WIDTH * HEIGHT))
+
+
 def get_matches(panels):
     residuals = panels & left(panels) & right(panels)
     horizontal_matches = residuals | left(residuals) | right(residuals)

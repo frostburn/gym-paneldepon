@@ -8,4 +8,3 @@ Look at some random play with `python misc.py`.
 
 # TODO:
 * Setup and setup instructions
-* Gym env wrapper for the plain engine

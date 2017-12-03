@@ -38,7 +38,7 @@ def test_flat_chain():
     total = 0
     state.render()
     for i in range(5):
-        total += state.step(None)
+        total += state.step(None)[0]
         state.render()
     assert (total == 6)
     assert (not any(state.colors))
@@ -57,7 +57,7 @@ def test_time_lag():
     total = 0
     for i in range(6):
         state.render()
-        total += state.step(None)
+        total += state.step(None)[0]
     assert (total == 6)
     assert (not any(state.colors))
 
@@ -84,7 +84,7 @@ def test_insert_support(time, height):
         action = None
         if i == time:
             action = (HEIGHT - height) * WIDTH
-        total += state.step(action)
+        total += state.step(action)[0]
     assert (total == 3)
 
 
@@ -104,7 +104,7 @@ def test_insert_chain(time):
         action = None
         if i == time:
             action = (HEIGHT - 3) * WIDTH
-        total += state.step(action)
+        total += state.step(action)[0]
     assert (total == 3)
 
 
@@ -123,7 +123,7 @@ def test_late_slip():
         action = None
         if i == 3:
             action = (HEIGHT - 1) * WIDTH
-        total += state.step(action)
+        total += state.step(action)[0]
     assert (total == 6)
 
 
@@ -143,7 +143,7 @@ def test_side_fall():
             action = (HEIGHT - 4) * WIDTH
         elif i == 1:
             action = 3 + (HEIGHT - 1) * WIDTH
-        total += state.step(action)
+        total += state.step(action)[0]
     assert (total == 3)
 
 
@@ -162,7 +162,7 @@ def test_fall_on():
         action = None
         if i == 0:
             action = (HEIGHT - 4) * WIDTH
-        total += state.step(action)
+        total += state.step(action)[0]
     assert (total == 3)
 
 
@@ -180,7 +180,7 @@ def test_catch():
         action = None
         if i == 2:
             action = (HEIGHT - 3) * WIDTH
-        total += state.step(action)
+        total += state.step(action)[0]
     assert (total == 3)
 
 
@@ -199,5 +199,5 @@ def test_support_with_fall(time):
         action = None
         if i == time:
             action = (HEIGHT - 2) * WIDTH
-        total += state.step(action)
+        total += state.step(action)[0]
     assert (total == 3)

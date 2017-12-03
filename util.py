@@ -1,14 +1,17 @@
-def print_color(color, bright=True, end=""):
+import sys
+
+
+def print_color(color, bright=True, outfile=sys.stdout):
     if bright:
-        print("\x1b[3{};1m".format(color), end=end)
+        outfile.write("\x1b[3{};1m".format(color))
     else:
-        print("\x1b[3{}m".format(color), end=end)
+        outfile.write("\x1b[3{}m".format(color))
 
 
-def print_reset(end=""):
-    print("\x1b[0m", end="")
+def print_reset(outfile=sys.stdout):
+    outfile.write("\x1b[0m")
 
 
-def print_up(n):
+def print_up(n, outfile=sys.stdout):
     for _ in range(n):
-        print("\033[A", end="")
+        outfile.write("\033[A")

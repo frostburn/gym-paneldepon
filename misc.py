@@ -20,7 +20,7 @@ def random_demo():
             action = ACTIONS[state.np_random.randint(0, len(ACTIONS))]
         else:
             action = RAISE_STACK
-        total += state.step(action)
+        total += state.step(action)[0]
         sleep(0.1)
         print_up(HEIGHT + 2)
         state.render()

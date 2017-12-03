@@ -1,8 +1,11 @@
+import sys
+
 from gym.utils import seeding
+import numpy as np
 
 from bitboard import (
     WIDTH, HEIGHT, FULL, NUM_COLORS, BOTTOM, TOP, RIGHT_WALL,
-    panels_from_list, up, down, left, right, get_matches
+    panels_from_list, up, down, left, right, popcount, get_matches
 )
 from util import print_color, print_reset
 
@@ -17,12 +20,15 @@ ACTIONS.append(None)
 
 class State(object):
     def __init__(self):
+        self.reset()
+        self.seed()
+
+    def reset(self):
         self.colors = [0] * NUM_COLORS
         self.falling = 0
         self.swapping = 0
         self.chaining = 0
         self.chain_number = 0
-        self.seed()
 
     @classmethod
     def from_list(cls, stack):
@@ -62,33 +68,37 @@ class State(object):
         other.chain_number = self.chain_number
         return other
 
-    def render(self):
+    def render(self, outfile=sys.stdout):
         for i in range(HEIGHT):
             for j in range(WIDTH):
                 p = 1 << (j + i * WIDTH)
                 empty = True
                 for k, panels in enumerate(self.colors):
                     if p & panels:
-                        print_color(k + 1, bright=bool(p & self.chaining))
+                        print_color(
+                            k + 1,
+                            bright=bool(p & self.chaining),
+                            outfile=outfile
+                        )
                         empty = False
                 if empty:
                     if p & self.swapping:
-                        print("\u2015", end="")
+                        outfile.write("\u2015")
                     else:
-                        print("\u00b7", end="")
+                        outfile.write("\u00b7")
                 elif p & self.falling:
                     if p & self.swapping:
-                        print("\u25a5", end="")
+                        outfile.write("\u25a5")
                     else:
-                        print("\u25a1", end="")
+                        outfile.write("\u25a1")
                 elif p & self.swapping:
-                    print("\u25a4", end="")
+                    outfile.write("\u25a4")
                 else:
-                    print("\u25a3", end="")
-                print(" ", end="")
-                print_reset()
-            print()
-        print("chain={}".format(self.chain_number))
+                    outfile.write("\u25a3")
+                outfile.write(" ")
+                print_reset(outfile=outfile)
+            outfile.write("\n")
+        outfile.write("chain={}\n".format(self.chain_number))
 
     def swap(self, index):
         self.swapping = 0
@@ -144,6 +154,7 @@ class State(object):
             chain_beam |= matches
             self.colors[i] ^= matches
             panels |= self.colors[i]
+        combo_size = popcount(chain_beam)
         if self.chaining & chain_beam:
             self.chain_number += 1
         if chain_beam:
@@ -156,7 +167,7 @@ class State(object):
         self.chaining |= panels & chain_beam
         if not self.chaining:
             self.chain_number = 0
-        return score
+        return score, combo_size
 
     def _insert_row(self, row):
         self.falling = up(self.falling)
@@ -176,7 +187,7 @@ class State(object):
             row = [self.np_random.randint(0, NUM_COLORS) for i in range(WIDTH)]
             temp = self.clone()
             temp._insert_row(row)
-            if not temp.clear_matches():
+            if not temp.clear_matches()[0]:
                 break
         self._insert_row(row)
 
@@ -184,7 +195,21 @@ class State(object):
         if action is not RAISE_STACK:
             self.swap(action)
         self.drop_one()
-        score = self.clear_matches()
+        result = self.clear_matches()
         if action is RAISE_STACK:
             self.raise_stack()
-        return score
+        return result
+
+    def encode(self):
+        np_state = np.zeros((NUM_COLORS + 3, HEIGHT, WIDTH))
+        features = self.colors[:]
+        features.append(self.falling)
+        features.append(self.chaining)
+        features.append(self.swapping)
+        for i, feature in enumerate(features):
+            p = 1
+            for j in range(HEIGHT):
+                for k in range(WIDTH):
+                    np_state[i][j][k] = bool(p & feature)
+                    p <<= 1
+        return np_state
