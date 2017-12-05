@@ -1,8 +1,7 @@
 import pytest
 
-from bitboard import WIDTH, HEIGHT, FULL
-from state import State
-
+from gym_paneldepon.bitboard import FULL, HEIGHT, WIDTH
+from gym_paneldepon.state import State
 
 _ = None
 R = 0

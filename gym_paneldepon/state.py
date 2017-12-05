@@ -1,14 +1,11 @@
 import sys
 
-from gym.utils import seeding
 import numpy as np
+from gym.utils import seeding
 
-from bitboard import (
-    WIDTH, HEIGHT, FULL, NUM_COLORS, BOTTOM, TOP, RIGHT_WALL,
-    panels_from_list, up, down, left, right, popcount, get_matches
-)
-from util import print_color, print_reset
-
+from gym_paneldepon.bitboard import BOTTOM, FULL, HEIGHT, NUM_COLORS, RIGHT_WALL, TOP, WIDTH  # noqa: I001
+from gym_paneldepon.bitboard import down, get_matches, left, panels_from_list, popcount, right, up  # noqa: I001
+from gym_paneldepon.util import print_color, print_reset
 
 RAISE_STACK = object()
 ACTIONS = [RAISE_STACK]

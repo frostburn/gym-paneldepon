@@ -1,7 +1,7 @@
 from time import sleep
 
 from bitboard import HEIGHT
-from state import State, ACTIONS, RAISE_STACK
+from state import ACTIONS, RAISE_STACK, State
 from util import print_up
 
 

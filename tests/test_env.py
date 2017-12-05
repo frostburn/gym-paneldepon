@@ -2,7 +2,7 @@ import numpy as np
 from gym.envs.registration import make
 
 # Trigger registration
-import env as env_module  # noqa: F401
+import gym_paneldepon.env  # noqa: F401
 
 
 def test_env():

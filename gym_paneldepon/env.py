@@ -1,13 +1,12 @@
 import sys
 
 import gym
-from gym.envs.registration import register
 from gym import spaces
+from gym.envs.registration import register
 from six import StringIO
 
-from bitboard import WIDTH, HEIGHT, NUM_COLORS
-from state import State, ACTIONS
-
+from gym_paneldepon.bitboard import HEIGHT, NUM_COLORS, WIDTH
+from gym_paneldepon.state import ACTIONS, State
 
 MAX_CHAIN = 13
 
@@ -59,7 +58,7 @@ class PdPEndlessEnv(gym.Env):
 
 register(
     id="PdPEndless-v0",
-    entry_point="env:PdPEndlessEnv",
+    entry_point="gym_paneldepon.env:PdPEndlessEnv",
     max_episode_steps=200,
     reward_threshold=25.0,
 )
