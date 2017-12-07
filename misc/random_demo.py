@@ -1,8 +1,8 @@
 from time import sleep
 
-from bitboard import HEIGHT
-from state import ACTIONS, RAISE_STACK, State
-from util import print_up
+from gym_paneldepon.bitboard import HEIGHT
+from gym_paneldepon.state import ACTIONS, RAISE_STACK, State
+from gym_paneldepon.util import print_up
 
 
 def random_demo():
