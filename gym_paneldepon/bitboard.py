@@ -76,16 +76,3 @@ def get_matches(panels):
     vertical_matches = residuals | up(residuals) | down(residuals)
 
     return horizontal_matches | vertical_matches
-
-
-def drop_one(panels, empty):
-    assert (not (panels & empty))
-    row = BOTTOM
-    for i in range(HEIGHT - 1):
-        falling = down(panels) & row & empty
-        panels |= falling
-        falling = up(falling)
-        panels ^= falling
-        empty ^= falling
-        row = up(row)
-    return panels

@@ -51,10 +51,6 @@ class PdPEndlessEnv(gym.Env):
         observation = (chain_number, self.state.encode())
         return observation, reward, False, {"state": self.state}
 
-    @property
-    def _state(self):
-        return self.state
-
 
 register(
     id="PdPEndless-v0",

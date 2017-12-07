@@ -200,3 +200,24 @@ def test_support_with_fall(time):
             action = (HEIGHT - 2) * WIDTH
         total += state.step(action)[0]
     assert (total == 3)
+
+
+def test_uneven_from_list():
+    bad_stack = [R, G, B]
+    with pytest.raises(ValueError):
+        State.from_list(bad_stack)
+
+
+def test_too_big_from_list():
+    bad_stack = [R, G, B] * 100
+    with pytest.raises(ValueError):
+        State.from_list(bad_stack)
+
+
+def test_nop_raise():
+    state = State()
+    for i in range(HEIGHT):
+        state.raise_stack()
+    colors = state.colors[:]
+    state.raise_stack()
+    assert state.colors == colors
