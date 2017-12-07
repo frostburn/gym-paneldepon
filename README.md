@@ -1,10 +1,8 @@
-# gym-paneldepon
+# gym_paneldepon
 OpenAI Gym Environment for Panel de Pon
 
-# WIP
-This is a work in progress.
-For now you need to figure out the correct dependencies yourself.
-Look at some random play with `python misc.py`.
+# Installing for development
+It is recommended to install this package inside a `virtualenv` with `pip install -r requirements-dev.txt`.
 
-# TODO:
-* Setup and setup instructions
+# Testing
+Run `tox`.

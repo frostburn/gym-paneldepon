@@ -1,3 +1,5 @@
+import sys
+
 NUM_COLORS = 6
 WIDTH = 6
 HEIGHT = 12
@@ -13,15 +15,15 @@ RIGHT_BLOCK = FULL ^ LEFT_WALL
 RIGHT_WALL = LEFT_WALL << (WIDTH - 1)
 
 
-def print_panels(panels):
+def print_panels(panels, outfile=sys.stdout):
     for i in range(HEIGHT):
         for j in range(WIDTH):
             p = 1 << (j + i * WIDTH)
             if panels & p:
-                print("@ ", end="")
+                outfile.write("@ ")
             else:
-                print("* ", end="")
-        print()
+                outfile.write("* ")
+        outfile.write("\n")
 
 
 def panels_to_list(panels):
