@@ -18,9 +18,10 @@ ACTIONS.append(None)
 
 
 class State(object):
-    def __init__(self):
+    def __init__(self, scoring_method=None):
         self.reset()
         self.seed()
+        self.scoring_method = scoring_method
 
     def reset(self):
         self.colors = [0] * NUM_COLORS
@@ -60,6 +61,7 @@ class State(object):
 
     def clone(self):
         other = State()
+        other.scoring_method = self.scoring_method
         other.colors = self.colors[:]
         other.falling = self.falling
         other.swapping = self.swapping
@@ -197,7 +199,7 @@ class State(object):
         result = self.clear_matches()
         if action is RAISE_STACK:
             self.raise_stack()
-        return result
+        return self.calculate_score(result)
 
     def encode(self):
         np_state = np.zeros((NUM_COLORS + 3, HEIGHT, WIDTH))
@@ -212,3 +214,14 @@ class State(object):
                     np_state[i][j][k] = bool(p & feature)
                     p <<= 1
         return np_state
+
+    def calculate_score(self, result):
+        if self.scoring_method is None:
+            return result
+        chain, combo = result
+        if self.scoring_method == "endless":
+            if chain:
+                return chain
+            elif combo:
+                return self.chain_number
+            return 0

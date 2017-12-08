@@ -25,7 +25,7 @@ class PdPEndlessEnv(gym.Env):
     ))
 
     def __init__(self):
-        self.state = State()
+        self.state = State(scoring_method="endless")
         self._seed()
 
     def _seed(self, seed=None):
@@ -45,8 +45,8 @@ class PdPEndlessEnv(gym.Env):
 
     def _step(self, action):
         action = ACTIONS[action]
-        chain_size, combo_size = self.state.step(action)
-        reward = min(chain_size, MAX_CHAIN)
+        score = self.state.step(action)
+        reward = min(score, MAX_CHAIN)
         chain_number = min(self.state.chain_number, MAX_CHAIN - 1)
         observation = (chain_number, self.state.encode())
         return observation, reward, False, {"state": self.state}

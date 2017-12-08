@@ -221,3 +221,39 @@ def test_nop_raise():
     colors = state.colors[:]
     state.raise_stack()
     assert state.colors == colors
+
+
+def test_bonus():
+    stack = [
+        G, _, _, _, _, _,
+        R, _, _, _, Y, P,
+        R, B, B, Y, P, C,
+        R, G, G, B, Y, P,
+    ]
+    state = State.from_list(stack)
+    state.scoring_method = "endless"
+    total = 0
+    for i in range(10):
+        state.render()
+        action = None
+        if i == 4:
+            action = 4 + (HEIGHT - 2) * WIDTH
+        if i == 6:
+            action = 3 + (HEIGHT - 2) * WIDTH
+        total += state.step(action)
+    assert (total == 1 + 2 + 2 + 3 + 3)
+
+
+def test_clone():
+    state = State(scoring_method="endless")
+    for i in range(5):
+        state.raise_stack()
+    state.step(WIDTH * HEIGHT - 4)
+    state.render()
+
+    clone = state.clone()
+    assert all(a == b for a, b in zip(clone.colors, state.colors))
+    assert clone.falling == state.falling
+    assert clone.swapping == state.swapping
+    assert clone.chaining == state.chaining
+    assert clone.scoring_method == state.scoring_method
