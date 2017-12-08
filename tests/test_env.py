@@ -1,8 +1,9 @@
 import numpy as np
 from gym.envs.registration import make
 
-# Trigger registration
-import gym_paneldepon.env  # noqa: F401
+from gym_paneldepon.env import register
+
+register()
 
 
 def test_env():

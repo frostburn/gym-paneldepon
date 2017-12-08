@@ -1,8 +1,8 @@
 import sys
 
 import gym
+import gym.envs.registration
 from gym import spaces
-from gym.envs.registration import register
 from six import StringIO
 
 from gym_paneldepon.bitboard import HEIGHT, NUM_COLORS, WIDTH
@@ -52,9 +52,10 @@ class PdPEndlessEnv(gym.Env):
         return observation, reward, False, {"state": self.state}
 
 
-register(
-    id="PdPEndless-v0",
-    entry_point="gym_paneldepon.env:PdPEndlessEnv",
-    max_episode_steps=200,
-    reward_threshold=25.0,
-)
+def register():
+    gym.envs.registration.register(
+        id="PdPEndless-v0",
+        entry_point="gym_paneldepon.env:PdPEndlessEnv",
+        max_episode_steps=200,
+        reward_threshold=25.0,
+    )
