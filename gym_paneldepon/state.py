@@ -12,11 +12,10 @@ from gym_paneldepon.util import print_color, print_reset
 NUM_COLORS = 6
 
 RAISE_STACK = object()
-ACTIONS = [RAISE_STACK]
+ACTIONS = [None, RAISE_STACK]
 for i in range(HEIGHT):
     for j in range(WIDTH - 1):
         ACTIONS.append(j + i * WIDTH)
-ACTIONS.append(None)
 
 
 class State(object):

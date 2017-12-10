@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from gym.envs.registration import make
 
 from gym_paneldepon.env import register
@@ -6,8 +7,9 @@ from gym_paneldepon.env import register
 register()
 
 
-def test_env():
-    env = make("PdPEndless-v0")
+@pytest.mark.parametrize("name", ["PdPEndless-v0", "PdPEndless4-v0"])
+def test_env(name):
+    env = make(name)
     ob_space = env.observation_space
     act_space = env.action_space
     ob = env.reset()
@@ -32,8 +34,9 @@ def test_env():
     env.close()
 
 
-def test_random_rollout():
-    env = make("PdPEndless-v0")
+@pytest.mark.parametrize("name", ["PdPEndless-v0", "PdPEndless4-v0"])
+def test_random_rollout(name):
+    env = make(name)
     agent = lambda ob: env.action_space.sample()  # noqa: E731
     ob = env.reset()
     for _ in range(100):
