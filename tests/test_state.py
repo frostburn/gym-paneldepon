@@ -1,6 +1,6 @@
 import pytest
 
-from gym_paneldepon.bitboard import FULL, HEIGHT, WIDTH
+from gym_paneldepon.bitboard import FULL, WIDTH
 from gym_paneldepon.state import State
 
 _ = None
@@ -14,7 +14,7 @@ C = 5
 
 def test_raise_stack():
     state = State()
-    for i in range(HEIGHT):
+    for i in range(state.height):
         state.raise_stack()
     for i in range(10):
         state.step(None)
@@ -27,11 +27,11 @@ def test_raise_stack():
 
 def test_flat_chain():
     state = State()
-    state.colors[0] = 7 << (WIDTH * (HEIGHT - 1))
-    state.colors[1] = 6 << (WIDTH * (HEIGHT - 2))
-    state.colors[1] |= 8 << (WIDTH * (HEIGHT - 1))
-    state.colors[2] = 8 << (WIDTH * (HEIGHT - 2))
-    state.colors[2] |= 48 << (WIDTH * (HEIGHT - 1))
+    state.colors[0] = 7 << (WIDTH * (state.height - 1))
+    state.colors[1] = 6 << (WIDTH * (state.height - 2))
+    state.colors[1] |= 8 << (WIDTH * (state.height - 1))
+    state.colors[2] = 8 << (WIDTH * (state.height - 2))
+    state.colors[2] |= 48 << (WIDTH * (state.height - 1))
     state.sanitize()
 
     total = 0
@@ -82,7 +82,7 @@ def test_insert_support(time, height):
         state.render()
         action = None
         if i == time:
-            action = (HEIGHT - height) * WIDTH
+            action = (state.height - height) * WIDTH
         total += state.step(action)[0]
     assert (total == 3)
 
@@ -102,7 +102,7 @@ def test_insert_chain(time):
         state.render()
         action = None
         if i == time:
-            action = (HEIGHT - 3) * WIDTH
+            action = (state.height - 3) * WIDTH
         total += state.step(action)[0]
     assert (total == 3)
 
@@ -121,7 +121,7 @@ def test_late_slip():
         state.render()
         action = None
         if i == 3:
-            action = (HEIGHT - 1) * WIDTH
+            action = (state.height - 1) * WIDTH
         total += state.step(action)[0]
     assert (total == 6)
 
@@ -139,9 +139,9 @@ def test_side_fall():
         state.render()
         action = None
         if i == 0:
-            action = (HEIGHT - 4) * WIDTH
+            action = (state.height - 4) * WIDTH
         elif i == 1:
-            action = 3 + (HEIGHT - 1) * WIDTH
+            action = 3 + (state.height - 1) * WIDTH
         total += state.step(action)[0]
     assert (total == 3)
 
@@ -160,7 +160,7 @@ def test_fall_on():
         state.render()
         action = None
         if i == 0:
-            action = (HEIGHT - 4) * WIDTH
+            action = (state.height - 4) * WIDTH
         total += state.step(action)[0]
     assert (total == 3)
 
@@ -178,7 +178,7 @@ def test_catch():
         state.render()
         action = None
         if i == 2:
-            action = (HEIGHT - 3) * WIDTH
+            action = (state.height - 3) * WIDTH
         total += state.step(action)[0]
     assert (total == 3)
 
@@ -197,7 +197,7 @@ def test_support_with_fall(time):
         state.render()
         action = None
         if i == time:
-            action = (HEIGHT - 2) * WIDTH
+            action = (state.height - 2) * WIDTH
         total += state.step(action)[0]
     assert (total == 3)
 
@@ -216,7 +216,7 @@ def test_too_big_from_list():
 
 def test_nop_raise():
     state = State()
-    for i in range(HEIGHT):
+    for i in range(state.height):
         state.raise_stack()
     colors = state.colors[:]
     state.raise_stack()
@@ -237,18 +237,18 @@ def test_bonus():
         state.render()
         action = None
         if i == 4:
-            action = 4 + (HEIGHT - 2) * WIDTH
+            action = 4 + (state.height - 2) * WIDTH
         if i == 6:
-            action = 3 + (HEIGHT - 2) * WIDTH
+            action = 3 + (state.height - 2) * WIDTH
         total += state.step(action)
     assert (total == 1 + 2 + 2 + 3 + 3)
 
 
 def test_clone():
-    state = State(scoring_method="endless")
+    state = State(scoring_method="endless", height=7)
     for i in range(5):
         state.raise_stack()
-    state.step(WIDTH * HEIGHT - 4)
+    state.step(WIDTH * state.height - 4)
     state.render()
 
     clone = state.clone()
@@ -257,3 +257,4 @@ def test_clone():
     assert clone.swapping == state.swapping
     assert clone.chaining == state.chaining
     assert clone.scoring_method == state.scoring_method
+    assert clone.height == state.height

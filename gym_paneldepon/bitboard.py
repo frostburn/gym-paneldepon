@@ -40,6 +40,10 @@ def panels_from_list(stack):
     return panels
 
 
+def dot(x, y):
+    return 1 << (x + y * WIDTH)
+
+
 def left(panels):
     return (panels & RIGHT_BLOCK) >> 1
 
