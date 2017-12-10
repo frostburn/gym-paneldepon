@@ -1,6 +1,5 @@
 import sys
 
-NUM_COLORS = 6
 WIDTH = 6
 HEIGHT = 12
 NUM_BLOCKS = WIDTH * HEIGHT

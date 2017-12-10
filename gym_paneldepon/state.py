@@ -5,9 +5,11 @@ import sys
 import numpy as np
 from gym.utils import seeding
 
-from gym_paneldepon.bitboard import FULL, HEIGHT, NUM_COLORS, TOP, WIDTH  # noqa: I001
+from gym_paneldepon.bitboard import FULL, HEIGHT, TOP, WIDTH  # noqa: I001
 from gym_paneldepon.bitboard import down, get_matches, left, panels_from_list, popcount, right, up  # noqa: I001
 from gym_paneldepon.util import print_color, print_reset
+
+NUM_COLORS = 6
 
 RAISE_STACK = object()
 ACTIONS = [RAISE_STACK]
@@ -18,42 +20,50 @@ ACTIONS.append(None)
 
 
 class State(object):
-    def __init__(self, scoring_method=None, height=HEIGHT):
+    def __init__(self, scoring_method=None, height=HEIGHT, num_colors=NUM_COLORS):
         if height > HEIGHT:
             raise ValueError("The maximum height is {}".format(HEIGHT))
-        self.reset()
-        self.seed()
         self.scoring_method = scoring_method
         self.height = height
+        self.num_colors = num_colors
+        self.reset()
+        self.seed()
 
     def reset(self):
-        self.colors = [0] * NUM_COLORS
+        self.colors = [0] * self.num_colors
         self.falling = 0
         self.swapping = 0
         self.chaining = 0
         self.chain_number = 0
 
     @classmethod
-    def from_list(cls, stack):
+    def from_list(cls, stack, num_colors=None):
         if len(stack) % WIDTH != 0:
             raise ValueError("Panels must form complete rows")
         if len(stack) > WIDTH * HEIGHT:
             raise ValueError("Too many panels")
+        if num_colors is None:
+            num_colors = 0
+            for panel in stack:
+                if panel is not None:
+                    num_colors = max(num_colors, panel)
+            num_colors += 1
         colors = []
-        for _ in range(NUM_COLORS):
+        for _ in range(num_colors):
             colors.append([])
         for panel in stack:
-            for i in range(NUM_COLORS):
+            for i in range(num_colors):
                 colors[i].append(panel == i)
         instance = cls()
         instance.colors = list(map(panels_from_list, colors))
         instance.height = len(stack) // WIDTH
+        instance.num_colors = num_colors
         return instance
 
     def sanitize(self):
-        for i in range(NUM_COLORS - 1):
+        for i in range(self.num_colors - 1):
             self.colors[i] &= FULL
-            for j in range(i + 1, NUM_COLORS):
+            for j in range(i + 1, self.num_colors):
                 self.colors[j] &= ~self.colors[i]
 
     def seed(self, seed=None):
@@ -64,6 +74,7 @@ class State(object):
         other = State()
         other.scoring_method = self.scoring_method
         other.height = self.height
+        other.num_colors = self.num_colors
         other.colors = self.colors[:]
         other.falling = self.falling
         other.swapping = self.swapping
@@ -113,7 +124,7 @@ class State(object):
             raise ValueError("Cannot swap off screen")
         p = 1 << index
         mask = ~(p | right(p))
-        for i in range(NUM_COLORS):
+        for i in range(self.num_colors):
             swapping_left = left(self.colors[i]) & p
             swapping_right = right(self.colors[i] & p)
             swapping = swapping_left | swapping_right
@@ -139,7 +150,7 @@ class State(object):
             falling = down(self.chaining & ~protected) & row & empty
             self.chaining |= falling
             self.chaining ^= up(falling)
-            for j in range(NUM_COLORS):
+            for j in range(self.num_colors):
                 panels = self.colors[j]
                 falling = down(panels & ~protected) & row & empty
                 self.falling |= falling
@@ -155,7 +166,7 @@ class State(object):
         chain_beam = 0
         protected = self.falling | self.swapping
         panels = 0
-        for i in range(NUM_COLORS):
+        for i in range(self.num_colors):
             matches = get_matches(self.colors[i] & ~protected)
             chain_beam |= matches
             self.colors[i] ^= matches
@@ -179,7 +190,7 @@ class State(object):
         self.falling = up(self.falling)
         self.chaining = up(self.chaining)
         self.swapping = up(self.swapping)
-        for i in range(NUM_COLORS):
+        for i in range(self.num_colors):
             self.colors[i] = up(self.colors[i])
             for j in range(WIDTH):
                 if row[j] == i:
@@ -190,7 +201,7 @@ class State(object):
             if panels & TOP:
                 return
         while True:
-            row = [self.np_random.randint(0, NUM_COLORS) for i in range(WIDTH)]
+            row = [self.np_random.randint(0, self.num_colors) for i in range(WIDTH)]
             temp = self.clone()
             temp._insert_row(row)
             if not temp.clear_matches()[0]:
@@ -207,7 +218,7 @@ class State(object):
         return self.calculate_score(result)
 
     def encode(self):
-        np_state = np.zeros((NUM_COLORS + 3, self.height, WIDTH))
+        np_state = np.zeros((self.num_colors + 3, self.height, WIDTH))
         features = self.colors[:]
         features.append(self.falling)
         features.append(self.chaining)

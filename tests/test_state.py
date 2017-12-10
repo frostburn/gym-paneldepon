@@ -10,6 +10,7 @@ Y = 2
 B = 3
 P = 4
 C = 5
+W = 6
 
 
 def test_raise_stack():
@@ -245,7 +246,7 @@ def test_bonus():
 
 
 def test_clone():
-    state = State(scoring_method="endless", height=7)
+    state = State(scoring_method="endless", height=7, num_colors=7)
     for i in range(5):
         state.raise_stack()
     state.step(WIDTH * state.height - 4)
@@ -258,3 +259,4 @@ def test_clone():
     assert clone.chaining == state.chaining
     assert clone.scoring_method == state.scoring_method
     assert clone.height == state.height
+    assert clone.num_colors == state.num_colors

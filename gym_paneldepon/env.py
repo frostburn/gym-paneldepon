@@ -5,8 +5,8 @@ import gym.envs.registration
 from gym import spaces
 from six import StringIO
 
-from gym_paneldepon.bitboard import HEIGHT, NUM_COLORS, WIDTH
-from gym_paneldepon.state import ACTIONS, State
+from gym_paneldepon.bitboard import HEIGHT, WIDTH
+from gym_paneldepon.state import ACTIONS, NUM_COLORS, State
 
 MAX_CHAIN = 13
 
