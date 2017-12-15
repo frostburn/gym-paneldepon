@@ -59,6 +59,16 @@ class State(object):
         instance.num_colors = num_colors
         return instance
 
+    def to_list(self):
+        stack = [None] * (WIDTH * self.height)
+        p = 1
+        for j in range(WIDTH * self.height):
+            for i, panels in enumerate(self.colors):
+                if p & panels:
+                    stack[j] = i
+            p <<= 1
+        return stack
+
     def sanitize(self):
         for i in range(self.num_colors - 1):
             self.colors[i] &= FULL
@@ -80,6 +90,13 @@ class State(object):
         other.chaining = self.chaining
         other.chain_number = self.chain_number
         return other
+
+    @property
+    def empty(self):
+        empty = FULL
+        for panels in self.colors:
+            empty ^= panels
+        return empty
 
     def render(self, outfile=sys.stdout):
         for i in range(self.height):
@@ -114,6 +131,7 @@ class State(object):
         outfile.write("chain={}\n".format(self.chain_number))
 
     def swap(self, index):
+        protected = self.swapping & up(self.empty)
         self.swapping = 0
         if index is None:
             return
@@ -123,6 +141,8 @@ class State(object):
             raise ValueError("Cannot swap off screen")
         p = 1 << index
         mask = ~(p | right(p))
+        if protected & ~mask:
+            return
         for i in range(self.num_colors):
             swapping_left = left(self.colors[i]) & p
             swapping_right = right(self.colors[i] & p)
@@ -139,9 +159,7 @@ class State(object):
 
     def drop_one(self):
         self.falling = 0
-        empty = FULL
-        for panels in self.colors:
-            empty ^= panels
+        empty = self.empty
         row = TOP << (WIDTH * (self.height - 1))
         protected = self.swapping
         empty &= ~self.swapping  # Air support needed for lateslips

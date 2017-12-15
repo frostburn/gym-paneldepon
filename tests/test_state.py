@@ -203,6 +203,43 @@ def test_support_with_fall(time):
     assert (total == 3)
 
 
+def test_no_levitation():
+    stack = [
+        G, G, _, _, _, _,
+        R, R, R, _, _, _,
+    ]
+    state = State.from_list(stack)
+    for i in range(5):
+        state.render()
+        action = (state.height - 2) * WIDTH
+        state.step(action)
+    stack = state.to_list()
+    assert (stack == [
+        _, _, _, _, _, _,
+        G, G, _, _, _, _,
+    ])
+
+
+def test_no_flight():
+    stack = [
+        G, _, _, _, _, _,
+        R, _, B, _, _, _,
+    ]
+    state = State.from_list(stack)
+    state.render()
+    state.step((state.height - 2) * WIDTH)
+    state.render()
+    state.step((state.height - 2) * WIDTH + 1)
+    for i in range(3):
+        state.render()
+        state.step(None)
+    stack = state.to_list()
+    assert (stack == [
+        _, _, _, _, _, _,
+        R, G, B, _, _, _,
+    ])
+
+
 def test_uneven_from_list():
     bad_stack = [R, G, B]
     with pytest.raises(ValueError):
