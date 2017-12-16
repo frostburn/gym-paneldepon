@@ -258,3 +258,11 @@ class State(object):
             elif combo:
                 return self.chain_number
             return 0
+
+    def get_children(self):
+        result = []
+        for i in range(2 + (WIDTH - 1) * self.height):
+            child = self.clone()
+            score = child.step(ACTIONS[i])
+            result.append((child, score))
+        return result

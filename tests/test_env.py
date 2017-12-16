@@ -47,3 +47,60 @@ def test_random_rollout(name):
         env.render(mode="human")
         if done:
             break
+
+
+@pytest.mark.parametrize("name", ["PdPEndless-v0", "PdPEndless4-v0"])
+def test_tree(name):
+    env = make(name)
+    agent = lambda ob: env.action_space.sample()  # noqa: E731
+    observation = env.reset()
+    for _ in range(12):
+        env.step(1)
+    for _ in range(50):
+        assert env.observation_space.contains(observation)
+        action = agent(observation)
+        assert env.action_space.contains(action)
+        (observation, reward, done, _info) = env.step(action)
+        assert env.reward_range[0] <= reward <= env.reward_range[-1]
+        env.render(mode="human")
+        rewards = env.unwrapped.get_tree(include_observations=False)
+        print(rewards)
+        for reward in rewards:
+            assert env.reward_range[0] <= reward <= env.reward_range[-1]
+        if done:
+            break
+
+
+def test_tree_search():
+    env = make("PdPEndless4-v0")
+
+    def deep_agent():
+        root = env.unwrapped.get_root()
+        best_score = 0
+        best_action = np.random.randint(2, env.action_space.n)
+        for action, (child, score) in enumerate(root.get_children()):
+            for grand_child, child_score in child.get_children():
+                for _, grand_child_score in grand_child.get_children():
+                    total = score + child_score + grand_child_score
+                    if total > best_score:
+                        best_action = action
+                        best_score = total
+        return best_action
+
+    def agent():
+        root = env.unwrapped.get_root()
+        best_score = 0
+        best_action = np.random.randint(2, env.action_space.n)
+        for action, (child, score) in enumerate(root.get_children()):
+            for grand_child, child_score in child.get_children():
+                total = score + child_score
+                if total > best_score:
+                    best_action = action
+                    best_score = total
+        return best_action
+    env.reset()
+    for _ in range(4):
+        env.step(1)
+    for _ in range(5):
+        env.step(agent())
+        env.render(mode="human")

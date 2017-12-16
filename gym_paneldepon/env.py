@@ -44,13 +44,34 @@ class PdPEndlessEnv(gym.Env):
         self.state.render(outfile)
         return outfile
 
-    def _step(self, action):
+    def _step_state(self, state, action, include_observations=True):
         action = ACTIONS[action]
-        score = self.state.step(action)
+        score = state.step(action)
         reward = min(score, self.max_chain)
-        chain_number = min(self.state.chain_number, self.max_chain - 1)
-        observation = (chain_number, self.state.encode())
+        chain_number = min(state.chain_number, self.max_chain - 1)
+        if include_observations:
+            observation = (chain_number, state.encode())
+            return observation, reward
+        return reward
+
+    def _step(self, action):
+        observation, reward = self._step_state(self.state, action)
         return observation, reward, False, {"state": self.state}
+
+    def get_tree(self, depth=1, include_observations=True):
+        """Returns potential observations and rewards up to a search depth"""
+        if depth != 1:
+            raise NotImplementedError("Only depth 1 trees supported")
+        results = []
+        for i in range(self.action_space.n):
+            clone = self.state.clone()
+            results.append(self._step_state(clone, i, include_observations=include_observations))
+        return results
+
+    def get_root(self):
+        clone = self.state.clone()
+        clone.seed()
+        return clone
 
 
 def register():
