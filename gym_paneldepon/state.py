@@ -150,7 +150,7 @@ class State(object):
             self.colors[i] &= mask
             self.colors[i] |= swapping
             self.swapping |= swapping
-        c = self.chaining
+        c = self.chaining & self.falling
         self.chaining &= mask
         self.chaining |= (left(c) & p) | right(c & p)
         # Air support needed for lateslips

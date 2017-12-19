@@ -263,6 +263,23 @@ def test_resolves_while_raising():
     ])
 
 
+def test_no_zero_fall_chain():
+    stack = [
+        _, _, G, _, G, G,
+        R, R, R, B, R, R,
+    ]
+    state = State.from_list(stack)
+    total = 0
+    state.render()
+    total += state.step(None)[0]
+    state.render()
+    total += state.step(2 + (state.height - 2) * WIDTH)[0]
+    state.render()
+    total += state.step(None)[0]
+    state.render()
+    assert (total == 2)
+
+
 def test_uneven_from_list():
     bad_stack = [R, G, B]
     with pytest.raises(ValueError):
