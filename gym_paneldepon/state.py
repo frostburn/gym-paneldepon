@@ -226,7 +226,9 @@ class State(object):
         self._insert_row(row)
 
     def step(self, action):
-        if action is not RAISE_STACK:
+        if action is RAISE_STACK:
+            self.swapping = 0
+        else:
             self.swap(action)
         self.drop_one()
         result = self.clear_matches()

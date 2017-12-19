@@ -1,7 +1,7 @@
 import pytest
 
 from gym_paneldepon.bitboard import FULL, WIDTH
-from gym_paneldepon.state import State
+from gym_paneldepon.state import RAISE_STACK, State
 
 _ = None
 R = 0
@@ -236,6 +236,29 @@ def test_no_flight():
     stack = state.to_list()
     assert (stack == [
         _, _, _, _, _, _,
+        R, G, B, _, _, _,
+    ])
+
+
+def test_resolves_while_raising():
+    stack = [
+        _, _, _, _, _, _,
+        G, _, _, _, _, _,
+        R, _, B, _, _, _,
+    ]
+    state = State.from_list(stack)
+    state.render()
+    state.step((state.height - 2) * WIDTH)
+    state.render()
+    state.step(RAISE_STACK)
+    state.render()
+    assert not state.swapping
+    assert state.falling
+    state.step(RAISE_STACK)
+    state.render()
+    assert not state.falling
+    stack = state.to_list()
+    assert (stack[:WIDTH] == [
         R, G, B, _, _, _,
     ])
 
