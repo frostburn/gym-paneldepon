@@ -3,6 +3,7 @@ import sys
 import gym
 import gym.envs.registration
 from gym import spaces
+import numpy as np  # noqa: I001
 from six import StringIO
 
 from gym_paneldepon.bitboard import HEIGHT, WIDTH
@@ -66,7 +67,9 @@ class PdPEndlessEnv(gym.Env):
         for i in range(self.action_space.n):
             clone = self.state.clone()
             results.append(self._step_state(clone, i, include_observations=include_observations))
-        return results
+        if include_observations:
+            return results
+        return np.array(results, dtype="float")
 
     def get_root(self):
         clone = self.state.clone()
